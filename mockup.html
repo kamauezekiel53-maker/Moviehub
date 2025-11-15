@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PublicMovieHub Mockup</title>
+  <style>
+    body{font-family:Inter, system-ui, Arial; background:#071420; color:#e6eef3; margin:0; padding:20px;}
+    .frame{max-width:1100px; margin:0 auto; border-radius:14px; background:linear-gradient(90deg,#071420,#0b2a3a); padding:18px; box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+    .top{display:flex; align-items:center; justify-content:space-between}
+    .brand{font-size:1.3rem; font-weight:700}
+    .hero{display:flex; gap:18px; margin-top:18px}
+    .hero-left{flex:1}
+    .hero-right{width:360px; height:200px; border-radius:10px; background:linear-gradient(90deg,#0f2a34,#173748); display:flex; align-items:center; justify-content:center; font-size:48px}
+    .rows{margin-top:22px}
+    .row{margin-bottom:12px}
+    .carousel{display:flex; gap:12px; overflow:hidden; padding:6px}
+    .tile{width:220px; min-width:220px; height:120px; border-radius:10px; background:linear-gradient(90deg,#0b1e26,#0d2630); padding:12px; display:flex; flex-direction:column; justify-content:space-between}
+    .tile h4{margin:0;font-size:16px}
+    .tile p{margin:0;font-size:12px;color:#9aa4ad}
+    .footer{margin-top:18px; color:#9aa4ad; font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="top"><div class="brand">🍿 PublicMovieHub</div><div>Local accounts • Offline</div></div>
+    <div class="hero">
+      <div class="hero-left">
+        <h1 style="margin:0 0 8px 0">Watch public-domain & open-license films</h1>
+        <p style="color:#9aa4ad; margin:0 0 14px 0">Playable demos, watchlist saved in-browser, and offline caching — static deployable site.</p>
+        <div style="display:flex; gap:8px"><button style="padding:10px 14px;border-radius:10px;border:none;background:#ff6b6b;color:#071420;font-weight:700">Browse</button><button style="padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);color:#9aa4ad;background:transparent">Mockup</button></div>
+      </div>
+      <div class="hero-right">🎬</div>
+    </div>
+
+    <div class="rows">
+      <div class="row">
+        <h3 style="margin:8px 0">Featured</h3>
+        <div class="carousel">
+          <div class="tile"><h4>Elephants Dream</h4><p>2006 · Demo playable sample</p></div>
+          <div class="tile"><h4>Big Buck Bunny</h4><p>2008 · Demo placeholder</p></div>
+          <div class="tile"><h4>Sintel</h4><p>2010 · Demo placeholder</p></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <h3 style="margin:8px 0">Classics</h3>
+        <div class="carousel">
+          <div class="tile"><h4>Nosferatu</h4><p>1922 · Public domain (placeholder)</p></div>
+          <div class="tile"><h4>Night of the Living Dead</h4><p>1968 · Public domain (placeholder)</p></div>
+          <div class="tile"><h4>The General</h4><p>1926 · Placeholder</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">This mockup is static and meant to show layout & UI. Replace items with real posters and MP4/HLS sources.</div>
+  </div>
+</body>
+</html>
