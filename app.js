@@ -1,141 +1,257 @@
-// PublicMovieHub multi-file app.js
-const resultsEl = document.getElementById('results');
+// PublicMovieHub app.js - static, local-only accounts + watchlist + offline caching
+// Uses movies.json as data source (sample demo sources are playable).
+
+// DOM
+const rowsContainer = document.getElementById('rowsContainer');
+const searchInput = document.getElementById('search');
+const browseAllBtn = document.getElementById('browseAll');
+const openMockupBtn = document.getElementById('openMockup');
+const signinBtn = document.getElementById('signinBtn');
+const userChip = document.getElementById('userChip');
 const emptyEl = document.getElementById('empty');
-const searchBtn = document.getElementById('searchBtn');
-const browseBtn = document.getElementById('browseBtn');
-const qInput = document.getElementById('q');
 
-const modal = document.getElementById('modal');
-const player = document.getElementById('player');
-const pTitle = document.getElementById('p-title');
-const pMeta = document.getElementById('p-meta');
-const pDesc = document.getElementById('p-desc');
-const closeModal = document.getElementById('closeModal') || document.getElementById('closeModal');
-const openSource = document.getElementById('openSource');
-const statusEl = document.getElementById('status');
-const fullscreenBtn = document.getElementById('fullscreenBtn');
-let hlsInstance = null;
+// Player modal
+const playerModal = document.getElementById('playerModal');
+const videoPlayer = document.getElementById('videoPlayer');
+const videoTitle = document.getElementById('videoTitle');
+const videoDesc = document.getElementById('videoDesc');
+const closePlayerBtn = document.getElementById('closePlayer');
+const addWatchlistBtn = document.getElementById('addWatchlist');
+const openSourceBtn = document.getElementById('openSource');
+
+// Auth modal
+const authModal = document.getElementById('authModal');
+const authUser = document.getElementById('authUser');
+const authPass = document.getElementById('authPass');
+const authSignIn = document.getElementById('authSignIn');
+const authSignUp = document.getElementById('authSignUp');
+const authClose = document.getElementById('authClose');
+const authMsg = document.getElementById('authMsg');
+
 let movies = [];
+let currentUser = null;
+let currentMovie = null;
 
-// Load local curated list
-async function loadMovies() {
-  try {
+// Basic utils for local accounts & watchlist
+const STORAGE_KEYS = {
+  USERS: 'pm_users', // object: {username: {password, watchlist: [id,...]}}
+  SESSION: 'pm_session' // username
+};
+
+function loadUsers(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEYS.USERS);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function saveUsers(users){ localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users)); }
+
+function setSession(username){
+  if(username){ localStorage.setItem(STORAGE_KEYS.SESSION, username); currentUser = username; }
+  else { localStorage.removeItem(STORAGE_KEYS.SESSION); currentUser = null; }
+  renderUserChip();
+}
+
+function getSession(){ return localStorage.getItem(STORAGE_KEYS.SESSION); }
+
+function ensureUserExists(username){
+  const users = loadUsers();
+  if(!users[username]) users[username] = { password: null, watchlist: [] };
+  saveUsers(users);
+}
+
+function addToWatchlist(username, movieId){
+  const users = loadUsers();
+  if(!users[username]) return false;
+  if(!users[username].watchlist.includes(movieId)) users[username].watchlist.push(movieId);
+  saveUsers(users);
+  return true;
+}
+function removeFromWatchlist(username, movieId){
+  const users = loadUsers();
+  if(!users[username]) return false;
+  users[username].watchlist = users[username].watchlist.filter(x=>x!==movieId);
+  saveUsers(users);
+  return true;
+}
+function isInWatchlist(username, movieId){
+  const users = loadUsers();
+  if(!users[username]) return false;
+  return users[username].watchlist.includes(movieId);
+}
+function getWatchlist(username){
+  const users = loadUsers();
+  return users[username] ? (users[username].watchlist || []) : [];
+}
+
+// Authentication handlers (local-only)
+authSignUp.addEventListener('click', ()=>{
+  const u = (authUser.value||'').trim(); const p = (authPass.value||'').trim();
+  if(!u || !p){ authMsg.textContent='Enter username & password.'; return; }
+  const users = loadUsers();
+  if(users[u]){ authMsg.textContent='User exists — sign in instead.'; return; }
+  users[u] = { password: p, watchlist: [] };
+  saveUsers(users);
+  setSession(u);
+  authMsg.textContent='Account created. Signed in.';
+  setTimeout(()=> closeAuthModal(),700);
+});
+authSignIn.addEventListener('click', ()=>{
+  const u = (authUser.value||'').trim(); const p = (authPass.value||'').trim();
+  if(!u || !p){ authMsg.textContent='Enter username & password.'; return; }
+  const users = loadUsers();
+  if(!users[u] || users[u].password !== p){ authMsg.textContent='Invalid credentials.'; return; }
+  setSession(u);
+  authMsg.textContent='Signed in.';
+  setTimeout(()=> closeAuthModal(),400);
+});
+authClose.addEventListener('click', ()=> closeAuthModal());
+
+function openAuthModal(){
+  authModal.classList.add('open'); authModal.setAttribute('aria-hidden','false');
+  authMsg.textContent='Local-only accounts saved in your browser.';
+}
+function closeAuthModal(){
+  authModal.classList.remove('open'); authModal.setAttribute('aria-hidden','true');
+  authUser.value=''; authPass.value=''; authMsg.textContent='';
+}
+
+// Render user chip
+function renderUserChip(){
+  const session = getSession();
+  if(session){ userChip.classList.remove('hidden'); userChip.textContent = session + ' • Watchlist'; signinBtn.textContent = 'Sign Out'; currentUser = session; }
+  else { userChip.classList.add('hidden'); signinBtn.textContent = 'Sign In'; currentUser = null; }
+}
+signinBtn.addEventListener('click', ()=>{
+  const session = getSession();
+  if(session){ // sign out
+    setSession(null);
+  } else {
+    openAuthModal();
+  }
+});
+
+// Load movies.json
+async function loadMovies(){
+  try{
     const res = await fetch('movies.json');
     movies = await res.json();
-  } catch (e) {
-    console.warn('Failed to load movies.json, using empty list', e);
-    movies = [];
+  }catch(e){ console.warn('movies.json load failed', e); movies = []; }
+}
+
+// Build UI rows (simple buckets: Featured, Classics, Demos)
+function buildRows(){
+  rowsContainer.innerHTML = '';
+  const buckets = [
+    {title:'Featured', items: movies.slice(0,10)},
+    {title:'Classics', items: movies.slice(10,40)},
+    {title:'Open & Demo Movies', items: movies.slice(40,80)},
+    {title:'More to Explore', items: movies.slice(80,100)}
+  ];
+  for(const b of buckets){
+    const row = document.createElement('div'); row.className='row';
+    const h = document.createElement('h3'); h.textContent = b.title; row.appendChild(h);
+    const carousel = document.createElement('div'); carousel.className='carousel';
+    for(const m of b.items){
+      const tile = createTile(m);
+      carousel.appendChild(tile);
+    }
+    row.appendChild(carousel);
+    rowsContainer.appendChild(row);
   }
 }
 
-// create card
-function createCard(item) {
-  const div = document.createElement('div');
-  div.className = 'card';
-  const thumb = document.createElement('div');
-  thumb.className = 'thumb';
-  thumb.textContent = item.title || item.id;
-  const cb = document.createElement('div'); cb.className='card-body';
-  const t = document.createElement('h4'); t.className='title'; t.textContent = item.title || item.id;
-  const m = document.createElement('div'); m.className='meta'; m.textContent = item.year ? ('Year: '+item.year) : '';
-  const btn = document.createElement('button'); btn.className='play-btn'; btn.textContent='Play';
-  btn.onclick = () => openPlayer(item);
-  cb.appendChild(t); cb.appendChild(m); cb.appendChild(btn);
-  div.appendChild(thumb); div.appendChild(cb);
-  return div;
+// create tile element
+function createTile(m){
+  const t = document.createElement('div'); t.className='tile';
+  const th = document.createElement('div'); th.className='thumb'; th.textContent = m.title;
+  const meta = document.createElement('div'); meta.className='meta';
+  const title = document.createElement('div'); title.className='title'; title.textContent = m.title;
+  const year = document.createElement('div'); year.className='meta small'; year.style.marginTop='6px'; year.textContent = m.year || '';
+  meta.appendChild(title); meta.appendChild(year);
+  t.appendChild(th); t.appendChild(meta);
+  t.addEventListener('click', ()=> openPlayer(m));
+  return t;
 }
 
-async function populateResults(list) {
-  resultsEl.innerHTML = '';
-  if(!list || list.length === 0){
-    emptyEl.style.display = 'block';
-    return;
-  }
-  emptyEl.style.display = 'none';
-  for(const item of list){
-    const card = createCard(item);
-    resultsEl.appendChild(card);
-  }
-}
+// player controls
+function openPlayer(m){
+  currentMovie = m;
+  videoTitle.textContent = m.title;
+  videoDesc.textContent = m.description || '';
+  openSourceBtn.onclick = ()=> window.open(m.sourcePage || '#','_blank');
 
-function showStatus(s){ if(statusEl) statusEl.textContent = s; }
+  // set watchlist button text
+  if(getSession() && isInWatchlist(getSession(), m.id)) addWatchlistBtn.textContent = 'Remove from Watchlist';
+  else addWatchlistBtn.textContent = 'Add to Watchlist';
 
-function openPlayer(item) {
-  pTitle.textContent = item.title || item.id;
-  pMeta.textContent = item.year ? ('Year: '+item.year) : '';
-  pDesc.textContent = item.description || '';
-  openSource.onclick = () => window.open(item.sourcePage || '#', '_blank');
-
-  if(hlsInstance){ hlsInstance.destroy(); hlsInstance = null; }
-  player.pause();
-  player.removeAttribute('src');
-  player.load();
-
-  const src = item.source;
-  showStatus('Loading source...');
-  if(src && src.endsWith('.m3u8') && Hls.isSupported()){
-    hlsInstance = new Hls();
-    hlsInstance.loadSource(src);
-    hlsInstance.attachMedia(player);
-    hlsInstance.on(Hls.Events.MANIFEST_PARSED, function(){
-      player.play();
-      showStatus('Playing (HLS)');
-    });
-    hlsInstance.on(Hls.Events.ERROR, function(e,d){ console.warn(e,d); showStatus('HLS error'); });
+  if(window.hlsjs && m.source && m.source.endsWith('.m3u8') && Hls.isSupported()){
+    if(window.hls) window.hls.destroy();
+    window.hls = new Hls();
+    window.hls.loadSource(m.source);
+    window.hls.attachMedia(videoPlayer);
+    window.hls.on(Hls.Events.MANIFEST_PARSED, ()=> videoPlayer.play().catch(()=>{}));
   } else {
-    player.src = src;
-    player.crossOrigin = 'anonymous';
-    player.load();
-    player.play().then(()=> showStatus('Playing')).catch(err=> {
-      console.warn(err);
-      showStatus('Playback failed — CORS or unsupported format.');
-    });
+    // native mp4
+    videoPlayer.src = m.source;
+    videoPlayer.crossOrigin = 'anonymous';
+    videoPlayer.load();
+    videoPlayer.play().catch(()=>{});
   }
 
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden','false');
+  playerModal.classList.add('open'); playerModal.setAttribute('aria-hidden','false');
 }
-
+closePlayerBtn.addEventListener('click', closePlayer);
 function closePlayer(){
-  if(hlsInstance){ hlsInstance.destroy(); hlsInstance=null; }
-  player.pause();
-  player.removeAttribute('src');
-  player.load();
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden','true');
-  showStatus('Ready');
+  if(window.hls) { window.hls.destroy(); window.hls = null; }
+  videoPlayer.pause(); videoPlayer.removeAttribute('src'); videoPlayer.load();
+  playerModal.classList.remove('open'); playerModal.setAttribute('aria-hidden','true');
 }
 
-document.addEventListener('click', (e)=> {
-  if(e.target && e.target.id === 'closeModal') closePlayer();
+// watchlist button
+addWatchlistBtn.addEventListener('click', ()=>{
+  const user = getSession();
+  if(!user){ openAuthModal(); return; }
+  if(!currentMovie) return;
+  if(isInWatchlist(user, currentMovie.id)){
+    removeFromWatchlist(user, currentMovie.id);
+    addWatchlistBtn.textContent = 'Add to Watchlist';
+  } else {
+    addToWatchlist(user, currentMovie.id);
+    addWatchlistBtn.textContent = 'Remove from Watchlist';
+  }
 });
 
-fullscreenBtn.addEventListener('click', ()=> {
-  if(document.fullscreenElement) document.exitFullscreen();
-  else document.querySelector('.player-wrap').requestFullscreen().catch(()=>{});
+// search & browse
+searchInput.addEventListener('input', (e)=> {
+  const q = (e.target.value || '').trim().toLowerCase();
+  if(!q){ buildRows(); emptyEl.style.display='none'; return; }
+  const found = movies.filter(m => (m.title||'').toLowerCase().includes(q) || (m.description||'').toLowerCase().includes(q));
+  renderSearchResults(found);
 });
+browseAllBtn.addEventListener('click', ()=> buildRows());
+openMockupBtn.addEventListener('click', ()=> window.open('mockup.html','_blank'));
 
-// Search function: naive filter over local list
-function searchLocal(q) {
-  const ql = q.trim().toLowerCase();
-  if(!ql) return movies;
-  return movies.filter(m => (m.title || '').toLowerCase().includes(ql) || (m.description || '').toLowerCase().includes(ql));
+// render search results
+function renderSearchResults(list){
+  rowsContainer.innerHTML = '';
+  if(!list || list.length===0){ emptyEl.style.display='block'; return; }
+  emptyEl.style.display='none';
+  const row = document.createElement('div'); row.className='row';
+  const h = document.createElement('h3'); h.textContent='Search Results'; row.appendChild(h);
+  const carousel = document.createElement('div'); carousel.className='carousel';
+  for(const m of list){ carousel.appendChild(createTile(m)); }
+  row.appendChild(carousel);
+  rowsContainer.appendChild(row);
 }
-
-// Event handlers
-searchBtn.addEventListener('click', async ()=>{
-  const q = qInput.value || '';
-  const found = searchLocal(q);
-  await populateResults(found);
-});
-
-browseBtn.addEventListener('click', async ()=> {
-  await populateResults(movies);
-});
 
 // initial boot
-(async ()=> {
+(async function init(){
+  // expose Hls lib if available
+  window.hlsjs = typeof Hls !== 'undefined';
   await loadMovies();
-  await populateResults(movies);
-  showStatus('Ready — browse sample or search the local list.');
+  buildRows();
+  renderUserChip();
+  const sess = getSession();
+  if(sess) currentUser = sess;
 })();
