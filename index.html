@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MovieHub – Netflix Style</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff3b3b">
+</head>
+<body>
+
+<header>
+    <h1>🎬 MovieHub</h1>
+    <button id="view-favorites" class="favorite-btn">View Favorites</button>
+</header>
+
+<div class="search-bar">
+    <input type="text" id="search" placeholder="Search movies..." />
+</div>
+
+<h2 class="section-title">Trending This Week</h2>
+<div class="movies" id="trending"></div>
+
+<h2 class="section-title">Recommended for You</h2>
+<div class="movies" id="recommended"></div>
+
+<!-- Modal for trailer -->
+<div class="modal" id="modal">
+    <div class="modal-content" id="modal-content">
+        <span class="close" id="close">&times;</span>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
