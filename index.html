@@ -3,60 +3,85 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PublicMovieHub — Multi-file</title>
+  <title>PublicMovieHub — Play Public Domain Movies</title>
   <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#071420">
 </head>
 <body>
-  <header>
-    <div class="logo">🍿 <strong>PublicMovieHub</strong></div>
-    <div class="search">
-      <input id="q" class="search-input" placeholder="Search public domain movies (or leave blank to browse sample)">
-      <button id="searchBtn" class="btn">Search</button>
-      <button id="browseBtn" class="btn ghost">Browse sample</button>
-    </div>
+  <header class="topbar">
+    <div class="brand">🍿 <strong>PublicMovieHub</strong></div>
+
+    <nav class="nav">
+      <input id="search" class="search" placeholder="Search movies, genres, descriptions..." />
+      <button id="signinBtn" class="btn small">Sign In</button>
+      <div id="userChip" class="userchip hidden"></div>
+    </nav>
   </header>
 
-  <main>
-    <div class="controls-row">
-      <div class="sample-badge">Demo includes guaranteed-playable sample</div>
-      <div style="margin-left:auto; color:var(--muted)">Source: curated sample list (replace with real MP4/HLS links)</div>
-    </div>
+  <main class="app">
+    <section class="hero">
+      <div class="hero-left">
+        <h1 id="heroTitle">Watch public-domain & openly licensed films</h1>
+        <p id="heroText">Static accounts (local-only), watchlist, offline caching, and playable demos — no backend required.</p>
+        <div class="cta-row">
+          <button id="browseAll" class="btn large">Browse All</button>
+          <button id="openMockup" class="btn ghost large">Open Mockup</button>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-poster">🎬</div>
+      </div>
+    </section>
 
-    <section id="results" class="results"></section>
-    <div id="empty" class="empty">No results yet. Try browsing the sample list.</div>
+    <section class="rows" id="rowsContainer">
+      <!-- Rows (carousels) injected by JS -->
+    </section>
+
+    <div id="empty" class="empty">No movies found — try searching or browse all.</div>
   </main>
 
-  <footer>
-    Built with public-domain content. Replace sample links with files you have rights to.
+  <footer class="footer">
+    Built with public-domain demos • Local accounts only • Replace demo sources with real MP4/HLS links.
   </footer>
 
-  <!-- Player modal -->
-  <div id="modal" class="modal" role="dialog" aria-hidden="true">
-    <div class="player-wrap">
-      <div class="player-top">
-        <div style="flex:1">
-          <video id="player" controls crossorigin playsinline></video>
-        </div>
-        <div style="width:320px; min-width:220px;">
-          <div style="padding:8px 12px;">
-            <h3 id="p-title" style="margin:0 0 8px 0"></h3>
-            <div id="p-meta" class="meta small"></div>
-            <div id="p-desc" class="desc"></div>
-            <div style="margin-top:10px;">
-              <button id="openSource" class="play-btn">Open source</button>
-              <button id="closeModal" class="play-btn" style="margin-left:8px">Close</button>
-            </div>
-          </div>
+  <!-- Play modal -->
+  <div id="playerModal" class="modal" aria-hidden="true">
+    <div class="playerCard">
+      <video id="videoPlayer" controls crossorigin playsinline></video>
+      <div class="playerMeta">
+        <h3 id="videoTitle"></h3>
+        <p id="videoDesc"></p>
+        <div class="playerActions">
+          <button id="addWatchlist" class="btn small">Add to Watchlist</button>
+          <button id="openSource" class="btn small ghost">Open Source</button>
+          <button id="closePlayer" class="btn small ghost">Close</button>
         </div>
       </div>
-      <div class="player-controls">
-        <div id="status" class="small" style="color:var(--muted)">Ready</div>
-        <button id="fullscreenBtn" class="play-btn" style="margin-left:auto">Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- Sign-in modal -->
+  <div id="authModal" class="modal" aria-hidden="true">
+    <div class="authCard">
+      <h3 id="authTitle">Sign In / Sign Up</h3>
+      <input id="authUser" placeholder="username" />
+      <input id="authPass" placeholder="password" type="password" />
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+        <button id="authSignIn" class="btn small">Sign In</button>
+        <button id="authSignUp" class="btn small ghost">Sign Up</button>
+        <button id="authClose" class="btn small ghost">Close</button>
       </div>
+      <div id="authMsg" class="meta small" style="margin-top:8px;"></div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.5/dist/hls.min.js"></script>
   <script src="app.js"></script>
+  <script>
+    // register service worker for offline caching
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('service-worker.js').catch(e=>console.warn('SW register failed',e));
+    }
+  </script>
 </body>
 </html>
