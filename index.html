@@ -1,38 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MovieHub – Netflix Style</title>
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ff3b3b">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PublicMovieHub — Multi-file</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<header>
-    <h1>🎬 MovieHub</h1>
-    <button id="view-favorites" class="favorite-btn">View Favorites</button>
-</header>
-
-<div class="search-bar">
-    <input type="text" id="search" placeholder="Search movies..." />
-</div>
-
-<h2 class="section-title">Trending This Week</h2>
-<div class="movies" id="trending"></div>
-
-<h2 class="section-title">Recommended for You</h2>
-<div class="movies" id="recommended"></div>
-
-<!-- Modal for trailer -->
-<div class="modal" id="modal">
-    <div class="modal-content" id="modal-content">
-        <span class="close" id="close">&times;</span>
-        <div id="modal-body"></div>
+  <header>
+    <div class="logo">🍿 <strong>PublicMovieHub</strong></div>
+    <div class="search">
+      <input id="q" class="search-input" placeholder="Search public domain movies (or leave blank to browse sample)">
+      <button id="searchBtn" class="btn">Search</button>
+      <button id="browseBtn" class="btn ghost">Browse sample</button>
     </div>
-</div>
+  </header>
 
-<script src="app.js" defer></script>
+  <main>
+    <div class="controls-row">
+      <div class="sample-badge">Demo includes guaranteed-playable sample</div>
+      <div style="margin-left:auto; color:var(--muted)">Source: curated sample list (replace with real MP4/HLS links)</div>
+    </div>
+
+    <section id="results" class="results"></section>
+    <div id="empty" class="empty">No results yet. Try browsing the sample list.</div>
+  </main>
+
+  <footer>
+    Built with public-domain content. Replace sample links with files you have rights to.
+  </footer>
+
+  <!-- Player modal -->
+  <div id="modal" class="modal" role="dialog" aria-hidden="true">
+    <div class="player-wrap">
+      <div class="player-top">
+        <div style="flex:1">
+          <video id="player" controls crossorigin playsinline></video>
+        </div>
+        <div style="width:320px; min-width:220px;">
+          <div style="padding:8px 12px;">
+            <h3 id="p-title" style="margin:0 0 8px 0"></h3>
+            <div id="p-meta" class="meta small"></div>
+            <div id="p-desc" class="desc"></div>
+            <div style="margin-top:10px;">
+              <button id="openSource" class="play-btn">Open source</button>
+              <button id="closeModal" class="play-btn" style="margin-left:8px">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="player-controls">
+        <div id="status" class="small" style="color:var(--muted)">Ready</div>
+        <button id="fullscreenBtn" class="play-btn" style="margin-left:auto">Fullscreen</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.5/dist/hls.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
