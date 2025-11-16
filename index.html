@@ -1,136 +1,64 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Movie Hub</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<title>MovieVerse</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="style.css">
+
 </head>
 <body>
 
-  <!-- HEADER / SEARCH -->
-  <header class="hero">
-    <div class="hero-inner container">
-      <div class="brand-row">
-        <h1 class="brand">🎬 Movie Hub</h1>
-        <div class="controls">
-          <button id="themeToggle" title="Toggle light/dark">🌙</button>
-          <select id="colorTheme" title="Accent theme">
-            <option value="">Accent</option>
-            <option value="sunset">Sunset</option>
-            <option value="ocean">Ocean</option>
-            <option value="neo">Neo</option>
-          </select>
-        </div>
-      </div>
+<header>
+    <h1>🎬 MovieVerse</h1>
 
-      <div class="search-row">
-        <input id="searchInput" type="search" placeholder="Search movies..." />
-        <button id="searchBtn">Search</button>
-      </div>
+    <input id="searchInput" type="text" placeholder="Search movies, shows, anime...">
 
-      <div id="suggestions" class="suggestions hidden" aria-live="polite"></div>
-
-      <nav class="nav-sections" role="navigation" aria-label="Main sections">
+    <div class="tabs">
         <button class="sec-btn active" data-sec="popular">Popular</button>
         <button class="sec-btn" data-sec="trending">Trending</button>
-        <button class="sec-btn" data-sec="now_playing">Now Playing</button>
         <button class="sec-btn" data-sec="top_rated">Top Rated</button>
-        <button class="sec-btn" data-sec="tv_popular">TV Shows</button>
+        <button class="sec-btn" data-sec="now_playing">Now Playing</button>
+
+        <button class="sec-btn" data-sec="tv">TV Shows</button>
         <button class="sec-btn" data-sec="anime">Anime</button>
-      </nav>
-    </div>
-  </header>
-
-  <!-- OPTIONAL CAROUSELS (keeps UI lively) -->
-  <section id="carousels" class="container">
-    <div class="carousel-block">
-      <h2 class="carousel-title">🔥 Trending This Week</h2>
-      <button class="carousel-btn left" data-target="trendingRow">❮</button>
-      <div class="carousel-row" id="trendingRow" aria-label="Trending"></div>
-      <button class="carousel-btn right" data-target="trendingRow">❯</button>
     </div>
 
-    <div class="carousel-block">
-      <h2 class="carousel-title">⭐ Top Rated</h2>
-      <button class="carousel-btn left" data-target="topRatedRow">❮</button>
-      <div class="carousel-row" id="topRatedRow" aria-label="Top rated"></div>
-      <button class="carousel-btn right" data-target="topRatedRow">❯</button>
+</header>
+
+<div id="loader" class="loader hidden"></div>
+<div id="moviesGrid" class="grid"></div>
+
+<div class="page-controls">
+    <button id="prevPage">Prev</button>
+    <span id="pageInfo"></span>
+    <button id="nextPage">Next</button>
+</div>
+
+<!-- ======================= MODAL ======================= -->
+<div id="modal" class="modal hidden">
+    <div class="modal-content">
+        <span id="modalClose" class="close">&times;</span>
+
+        <img id="modalPoster" class="modal-poster">
+
+        <h2 id="modalTitle"></h2>
+        <p id="modalSub" class="sub"></p>
+        <p id="modalOverview"></p>
+
+        <h3>Cast</h3>
+        <div id="modalCast" class="cast"></div>
+
+        <h3>Stream</h3>
+        <div id="modalVideos"></div>
+
+        <h3>Downloads</h3>
+        <div id="modalDownload"></div>
+
     </div>
+</div>
 
-    <div class="carousel-block">
-      <h2 class="carousel-title">🎬 Now Playing</h2>
-      <button class="carousel-btn left" data-target="nowPlayingRow">❮</button>
-      <div class="carousel-row" id="nowPlayingRow" aria-label="Now playing"></div>
-      <button class="carousel-btn right" data-target="nowPlayingRow">❯</button>
-    </div>
-  </section>
-
-  <!-- LOADER -->
-  <div id="loader" class="loader hidden" aria-hidden="true" title="loading"></div>
-
-  <!-- MAIN GRID -->
-  <main class="container">
-    <section id="moviesGrid" class="grid" aria-live="polite"></section>
-
-    <div class="pagination">
-      <button id="prevPage">← Prev</button>
-      <span id="pageInfo">Page 1 of 1</span>
-      <button id="nextPage">Next →</button>
-    </div>
-  </main>
-
-  <!-- MOVIE MODAL -->
-  <div id="modal" class="modal hidden" aria-hidden="true">
-    <div class="modal-dialog">
-      <button id="modalClose" class="modal-close" aria-label="Close">✕</button>
-
-      <div class="modal-body">
-        <div class="modal-left">
-          <img id="modalPoster" class="modal-poster" alt="poster">
-          <div id="modalDownload" class="download-links"></div>
-        </div>
-
-        <div class="modal-right">
-          <h2 id="modalTitle"></h2>
-          <p id="modalSub" class="muted"></p>
-          <p id="modalOverview"></p>
-
-          <div class="modal-actions">
-            <button id="favBtn" class="btn">☆ Add to Watchlist</button>
-            <a id="openTmdb" class="btn outline" target="_blank" rel="noopener">Open on TMDb</a>
-          </div>
-
-          <h3>Trailers</h3>
-          <div id="modalVideos" class="video-grid"></div>
-
-          <h3>Cast</h3>
-          <div id="modalCast" class="cast-grid"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ACTOR MODAL -->
-  <div id="actorModal" class="modal hidden" aria-hidden="true">
-    <div class="modal-dialog">
-      <button class="modal-close actor-close" aria-label="Close">✕</button>
-      <div id="actorBody" class="modal-body actor-body"></div>
-    </div>
-  </div>
-
-  <!-- PLAYER MODAL (for trailers) -->
-  <div id="playerModal" class="modal hidden" aria-hidden="true">
-    <div class="modal-dialog small">
-      <button class="modal-close player-close">✕</button>
-      <div id="playerContainer" class="player-container"></div>
-    </div>
-  </div>
-
-  <footer class="footer container">
-    <small>Made with ❤️ — Movie Hub</small>
-  </footer>
-
-  <script src="app.js" defer></script>
+<script src="app.js"></script>
 </body>
 </html>
