@@ -1,60 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>MovieVerse</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieHub</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <header>
-    <h1>🎬 MovieVerse</h1>
+    <h1>MovieHub</h1>
 
-    <input id="searchInput" type="text" placeholder="Search movies, shows, anime...">
+    <input type="text" id="searchInput" placeholder="Search movies or shows...">
 
-    <div class="tabs">
+    <nav>
         <button class="sec-btn active" data-sec="popular">Popular</button>
         <button class="sec-btn" data-sec="trending">Trending</button>
-        <button class="sec-btn" data-sec="top_rated">Top Rated</button>
         <button class="sec-btn" data-sec="now_playing">Now Playing</button>
-
+        <button class="sec-btn" data-sec="top_rated">Top Rated</button>
         <button class="sec-btn" data-sec="tv">TV Shows</button>
         <button class="sec-btn" data-sec="anime">Anime</button>
-    </div>
-
+    </nav>
 </header>
 
-<div id="loader" class="loader hidden"></div>
-<div id="moviesGrid" class="grid"></div>
+<div id="loader" class="hidden">Loading...</div>
 
-<div class="page-controls">
+<div id="moviesGrid"></div>
+
+<div class="pagination">
     <button id="prevPage">Prev</button>
-    <span id="pageInfo"></span>
+    <span id="pageInfo">Page 1</span>
     <button id="nextPage">Next</button>
 </div>
 
-<!-- ======================= MODAL ======================= -->
+
+<!-- MODAL -->
 <div id="modal" class="modal hidden">
     <div class="modal-content">
-        <span id="modalClose" class="close">&times;</span>
 
-        <img id="modalPoster" class="modal-poster">
+        <span id="modalClose">✖</span>
 
-        <h2 id="modalTitle"></h2>
-        <p id="modalSub" class="sub"></p>
-        <p id="modalOverview"></p>
+        <div class="modal-top">
+            <img id="modalPoster" src="" alt="poster">
+
+            <div>
+                <h2 id="modalTitle"></h2>
+                <p id="modalSub"></p>
+                <p id="modalOverview"></p>
+            </div>
+        </div>
 
         <h3>Cast</h3>
-        <div id="modalCast" class="cast"></div>
+        <div id="modalCast" class="cast-box"></div>
 
-        <h3>Stream</h3>
-        <div id="modalVideos"></div>
+        <h3>Trailers / Stream</h3>
+        <div id="modalVideos" class="video-box"></div>
 
-        <h3>Downloads</h3>
-        <div id="modalDownload"></div>
+        <h3>Download</h3>
+        <div id="modalDownload" class="download-box"></div>
 
     </div>
 </div>
