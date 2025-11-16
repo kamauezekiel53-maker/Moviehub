@@ -1,68 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieHub</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MovieHub — Ultimate</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-<header>
-    <h1>MovieHub</h1>
+  <header class="hero">
+    <div class="hero-inner container">
+      <div class="brand-row">
+        <h1 class="brand">🎬 MovieHub</h1>
 
-    <input type="text" id="searchInput" placeholder="Search movies or shows...">
+        <div class="controls">
+          <input id="searchInput" placeholder="Search movies, shows, anime..." />
+          <select id="themeSelect" title="Choose theme">
+            <option value="">Default</option>
+            <option value="netflix">Netflix</option>
+            <option value="disney">Disney</option>
+            <option value="anime">Anime</option>
+            <option value="imdb">IMDB</option>
+            <option value="glass">Glass</option>
+          </select>
+          <button id="watchlistBtn" title="Watchlist">⭐ Watchlist</button>
+        </div>
+      </div>
 
-    <nav>
+      <nav class="nav-sections">
         <button class="sec-btn active" data-sec="popular">Popular</button>
         <button class="sec-btn" data-sec="trending">Trending</button>
         <button class="sec-btn" data-sec="now_playing">Now Playing</button>
         <button class="sec-btn" data-sec="top_rated">Top Rated</button>
         <button class="sec-btn" data-sec="tv">TV Shows</button>
         <button class="sec-btn" data-sec="anime">Anime</button>
-    </nav>
-</header>
+      </nav>
+    </div>
+  </header>
 
-<div id="loader" class="hidden">Loading...</div>
+  <main class="container">
+    <div id="loader" class="loader hidden" aria-hidden="true"></div>
 
-<div id="moviesGrid"></div>
+    <section id="moviesGrid" class="grid" aria-live="polite"></section>
 
-<div class="pagination">
-    <button id="prevPage">Prev</button>
-    <span id="pageInfo">Page 1</span>
-    <button id="nextPage">Next</button>
-</div>
+    <div class="pagination">
+      <button id="prevPage">← Prev</button>
+      <span id="pageInfo">Page 1</span>
+      <button id="nextPage">Next →</button>
+    </div>
+  </main>
 
+  <!-- WATCHLIST PANEL -->
+  <aside id="watchlistPanel" class="watchlist hidden" aria-hidden="true">
+    <div class="watchlist-head">
+      <h3>Watchlist</h3>
+      <div>
+        <button id="clearWatchlist" class="btn outline">Clear</button>
+        <button id="closeWatchlist" class="btn">Close</button>
+      </div>
+    </div>
+    <div id="watchlistItems" class="watchlist-items"></div>
+  </aside>
 
-<!-- MODAL -->
-<div id="modal" class="modal hidden">
-    <div class="modal-content">
-
-        <span id="modalClose">✖</span>
-
-        <div class="modal-top">
-            <img id="modalPoster" src="" alt="poster">
-
-            <div>
-                <h2 id="modalTitle"></h2>
-                <p id="modalSub"></p>
-                <p id="modalOverview"></p>
-            </div>
+  <!-- MOVIE MODAL -->
+  <div id="modal" class="modal hidden" aria-hidden="true" role="dialog">
+    <div class="modal-dialog">
+      <button id="modalClose" class="modal-close" aria-label="Close">✕</button>
+      <div class="modal-body">
+        <div class="modal-left">
+          <img id="modalPoster" class="modal-poster" alt="poster">
+          <div id="modalDownload" class="download-links"></div>
         </div>
 
-        <h3>Cast</h3>
-        <div id="modalCast" class="cast-box"></div>
+        <div class="modal-right">
+          <h2 id="modalTitle"></h2>
+          <p id="modalSub" class="muted"></p>
+          <p id="modalOverview"></p>
 
-        <h3>Trailers / Stream</h3>
-        <div id="modalVideos" class="video-box"></div>
+          <div class="modal-actions">
+            <button id="favBtn" class="btn">☆ Add to Watchlist</button>
+            <a id="openTmdb" class="btn outline" target="_blank" rel="noopener">Open on TMDb</a>
+          </div>
 
-        <h3>Download</h3>
-        <div id="modalDownload" class="download-box"></div>
+          <h3>Trailers</h3>
+          <div id="modalVideos" class="video-grid"></div>
 
+          <h3>Cast</h3>
+          <div id="modalCast" class="cast-grid"></div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<script src="app.js"></script>
+  <!-- PLAYER MODAL -->
+  <div id="playerModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-dialog small">
+      <button class="modal-close player-close" aria-label="Close">✕</button>
+      <div id="playerContainer" class="player-container"></div>
+    </div>
+  </div>
+
+<script src="app.js" defer></script>
 </body>
 </html>
