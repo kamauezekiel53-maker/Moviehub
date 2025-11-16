@@ -1,81 +1,157 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>MovieHub</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Movie Hub — Ultimate</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-<header>
-    <h1 class="logo">MovieHub</h1>
+  <!-- HERO / BACKGROUND VIDEO -->
+  <header class="hero">
+    <video class="hero-video" autoplay muted loop playsinline>
+      <source src="https://cdn.coverr.co/videos/coverr-night-city-lights-1583?fm=mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
 
-    <div class="controls">
-        <input id="searchInput" type="text" placeholder="Search movies...">
-        <button id="themeToggle">🌓</button>
-        <select id="colorTheme">
-            <option value="">Theme</option>
+    <div class="hero-inner">
+      <div class="brand-row">
+        <h1 class="brand">🎬 Movie Hub</h1>
+        <div class="controls">
+          <button id="themeToggle" title="Toggle light/dark">🌙</button>
+          <select id="colorTheme" title="Accent theme">
+            <option value="">Accent</option>
             <option value="sunset">Sunset</option>
             <option value="ocean">Ocean</option>
-            <option value="neo">Neon</option>
-        </select>
-    </div>
+            <option value="neo">Neo</option>
+            <option value="galaxy">Galaxy</option>
+            <option value="gold">Gold</option>
+            <option value="matrix">Matrix</option>
+          </select>
+          <button id="watchlistBtn" title="Open Watchlist">⭐ Watchlist</button>
+        </div>
+      </div>
 
-    <nav class="tabs">
+      <div class="search-row">
+        <input id="searchInput" type="search" placeholder="Search movies, TV shows, actors..." />
+        <button id="searchBtn">Search</button>
+      </div>
+
+      <div id="suggestions" class="suggestions hidden" aria-live="polite"></div>
+
+      <nav class="nav-sections" role="navigation" aria-label="Main sections">
         <button class="sec-btn active" data-sec="popular">Popular</button>
         <button class="sec-btn" data-sec="trending">Trending</button>
         <button class="sec-btn" data-sec="now_playing">Now Playing</button>
         <button class="sec-btn" data-sec="top_rated">Top Rated</button>
-        <button class="sec-btn" data-sec="tv">TV Shows</button>
+        <button class="sec-btn" data-sec="tv_popular">TV Shows</button>
         <button class="sec-btn" data-sec="anime">Anime</button>
-        <button class="sec-btn" data-sec="favorites">Favorites</button>
-    </nav>
-</header>
+      </nav>
+    </div>
+  </header>
 
-<div id="suggestions" class="hidden"></div>
+  <!-- CAROUSELS -->
+  <section id="carousels" class="container">
+    <div class="carousel-block">
+      <h2 class="carousel-title">🔥 Trending This Week</h2>
+      <button class="carousel-btn left" data-target="trendingRow">❮</button>
+      <div class="carousel-row" id="trendingRow" aria-label="Trending"></div>
+      <button class="carousel-btn right" data-target="trendingRow">❯</button>
+    </div>
 
-<main>
-    <div id="pageInfo"></div>
-    <div id="moviesGrid"></div>
+    <div class="carousel-block">
+      <h2 class="carousel-title">⭐ Top Rated</h2>
+      <button class="carousel-btn left" data-target="topRatedRow">❮</button>
+      <div class="carousel-row" id="topRatedRow" aria-label="Top rated"></div>
+      <button class="carousel-btn right" data-target="topRatedRow">❯</button>
+    </div>
+
+    <div class="carousel-block">
+      <h2 class="carousel-title">🎬 Now Playing</h2>
+      <button class="carousel-btn left" data-target="nowPlayingRow">❮</button>
+      <div class="carousel-row" id="nowPlayingRow" aria-label="Now playing"></div>
+      <button class="carousel-btn right" data-target="nowPlayingRow">❯</button>
+    </div>
+  </section>
+
+  <!-- LOADER / SKELETON / MAIN GRID -->
+  <div id="loader" class="loader hidden" aria-hidden="true"></div>
+
+  <main class="container">
+    <section id="moviesGrid" class="grid" aria-live="polite"></section>
 
     <div class="pagination">
-        <button id="prevPage">Prev</button>
-        <button id="nextPage">Next</button>
+      <button id="prevPage">← Prev</button>
+      <span id="pageInfo">Page 1 of 1</span>
+      <button id="nextPage">Next →</button>
     </div>
+  </main>
 
-    <div id="loader" class="hidden">Loading...</div>
-</main>
+  <!-- WATCHLIST SIDE PANEL -->
+  <aside id="watchlistPanel" class="watchlist hidden" aria-hidden="true">
+    <div class="watchlist-head">
+      <h3>Watchlist</h3>
+      <div>
+        <button id="clearWatchlist" class="btn outline">Clear</button>
+        <button id="closeWatchlist" class="btn">Close</button>
+      </div>
+    </div>
+    <div id="watchlistItems" class="watchlist-items"></div>
+  </aside>
 
-<!-- Movie Modal -->
-<div id="modal" class="hidden modal">
-    <div class="modal-content">
-        <span id="modalClose">×</span>
-
+  <!-- MOVIE DETAILS MODAL -->
+  <div id="modal" class="modal hidden" aria-hidden="true" role="dialog">
+    <div class="modal-dialog">
+      <button id="modalClose" class="modal-close" aria-label="Close">✕</button>
+      <div class="modal-body">
         <div class="modal-left">
-            <img id="modalPoster">
+          <img id="modalPoster" class="modal-poster" alt="poster">
+          <div id="modalDownload" class="download-links"></div>
         </div>
-
         <div class="modal-right">
-            <h2 id="modalTitle"></h2>
-            <p id="modalSub"></p>
-            <p id="modalOverview"></p>
+          <h2 id="modalTitle"></h2>
+          <p id="modalSub" class="muted"></p>
+          <p id="modalOverview"></p>
 
-            <h3>Cast</h3>
-            <div id="modalCast" class="cast-grid"></div>
+          <div class="modal-actions">
+            <button id="favBtn" class="btn">☆ Add to Watchlist</button>
+            <a id="openTmdb" class="btn outline" target="_blank" rel="noopener">Open on TMDb</a>
+          </div>
 
-            <h3>Trailers</h3>
-            <div id="modalVideos" class="video-grid"></div>
+          <h3>Trailers</h3>
+          <div id="modalVideos" class="video-grid"></div>
 
-            <h3>Download Links</h3>
-            <div id="modalDownload"></div>
-
-            <button id="favBtn" class="btn">❤️ Add to Favorites</button>
+          <h3>Cast</h3>
+          <div id="modalCast" class="cast-grid"></div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<script src="app.js"></script>
+  <!-- ACTOR MODAL -->
+  <div id="actorModal" class="modal hidden" aria-hidden="true" role="dialog">
+    <div class="modal-dialog">
+      <button class="modal-close actor-close" aria-label="Close">✕</button>
+      <div id="actorBody" class="modal-body actor-body"></div>
+    </div>
+  </div>
+
+  <!-- SMALL VIDEO PLAYER (for trailers) -->
+  <div id="playerModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-dialog small">
+      <button class="modal-close player-close" aria-label="Close">✕</button>
+      <div id="playerContainer" class="player-container"></div>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <footer class="footer container">
+    <small>Made with ❤️ — Movie Hub</small>
+  </footer>
+
+  <script src="app.js" defer></script>
 </body>
 </html>
