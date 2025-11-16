@@ -1,75 +1,75 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Hub</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="brand">Movie Hub</div>
-    <div class="controls">
-      <input id="searchInput" placeholder="Search movies..." autocomplete="off" />
+
+<header>
+  <h1>🎬 Movie Hub</h1>
+
+  <div class="top-controls">
+      <input id="searchInput" type="text" placeholder="Search movies...">
+      <button id="themeToggle">🌙</button>
+
       <select id="colorTheme">
-        <option value="">Default</option>
+        <option value="">Theme Color</option>
         <option value="sunset">Sunset</option>
         <option value="ocean">Ocean</option>
         <option value="neo">Neo</option>
       </select>
-      <button id="themeToggle" title="Toggle light/dark">🌓</button>
-    </div>
-  </header>
-
-  <main class="container">
-    <aside class="sidebar">
-      <button class="sec-btn active" data-sec="popular">Popular</button>
-      <button class="sec-btn" data-sec="trending">Trending</button>
-      <button class="sec-btn" data-sec="now_playing">Now Playing</button>
-      <button class="sec-btn" data-sec="top_rated">Top Rated</button>
-    </aside>
-
-    <section class="content">
-      <div id="loader" class="loader hidden">Loading…</div>
-
-      <div id="moviesGrid" class="grid"></div>
-
-      <div class="pager">
-        <button id="prevPage" class="btn">Prev</button>
-        <div id="pageInfo" class="page-info">Page 1</div>
-        <button id="nextPage" class="btn">Next</button>
-      </div>
-    </section>
-  </main>
-
-  <!-- Modal -->
-  <div id="modal" class="modal hidden" aria-hidden="true">
-    <div class="modal-inner">
-      <button id="modalClose" class="modal-close">✕</button>
-      <div class="modal-left">
-        <img id="modalPoster" alt="poster" />
-      </div>
-      <div class="modal-right">
-        <h2 id="modalTitle">Title</h2>
-        <div id="modalSub" class="muted"></div>
-        <p id="modalOverview"></p>
-
-        <h4>Cast</h4>
-        <div id="modalCast" class="cast-grid"></div>
-
-        <h4>Trailers</h4>
-        <div id="modalVideos" class="videos"></div>
-
-        <h4>Download / Streams</h4>
-        <div id="modalDownload" class="downloads"></div>
-      </div>
-    </div>
   </div>
 
-  <footer class="site-footer">
-    <small>Movie Hub • Demo</small>
-  </footer>
+  <div id="suggestions" class="suggestions hidden"></div>
 
-  <script src="app.js"></script>
+  <nav class="sections">
+    <button class="sec-btn active" data-sec="popular">Popular</button>
+    <button class="sec-btn" data-sec="top_rated">Top Rated</button>
+    <button class="sec-btn" data-sec="now_playing">Now Playing</button>
+    <button class="sec-btn" data-sec="trending">Trending</button>
+  </nav>
+</header>
+
+<div id="loader" class="loader hidden"></div>
+
+<div id="moviesGrid" class="grid"></div>
+
+<div class="pagination">
+  <button id="prevPage">Prev</button>
+  <span id="pageInfo">Page 1 of 1</span>
+  <button id="nextPage">Next</button>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <span id="modalClose" class="modal-close">&times;</span>
+
+    <div class="modal-header">
+      <img id="modalPoster" class="modal-poster">
+      <div>
+        <h2 id="modalTitle"></h2>
+        <p id="modalSub" class="muted"></p>
+      </div>
+    </div>
+
+    <p id="modalOverview"></p>
+
+    <h3>Cast</h3>
+    <div id="modalCast" class="cast-grid"></div>
+
+    <h3>Trailers</h3>
+    <div id="modalVideos" class="video-grid"></div>
+
+    <h3>Download Links</h3>
+    <div id="modalDownload"></div>
+
+  </div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
