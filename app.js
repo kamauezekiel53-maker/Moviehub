@@ -1,13 +1,11 @@
 /* =========================
-   Config: update these
+   Config
    ========================= */
 
-// Your TMDB API key (you shared: 7cc9abef50e4c94689f48516718607be)
+// TMDB API key (you shared this)
 const TMDB_API_KEY = "7cc9abef50e4c94689f48516718607be";
 
-// GiftedTech movie sources API base.
-// You shared: https://movieapi.giftedtech.co.ke/api/sources /6127914234610600632
-// If the pattern is /api/sources/{id}, set as below:
+// GiftedTech movie sources API base (pattern: /api/sources/{id})
 const GIFTED_BASE = "https://movieapi.giftedtech.co.ke/api/sources/";
 
 /* =========================
@@ -116,16 +114,16 @@ const modal = qs("#modal");
 const modalClose = qs("#modal-close");
 const streamPlayer = qs("#stream-player");
 const downloadLink = qs("#download-link");
-const playStreamBtn = qs("#play-stream");
-const showTrailerBtn = qs("#show-trailer");
 const trailerWrap = qs("#trailer");
 const trailerFrame = qs("#trailer-frame");
 const movieTitleEl = qs("#movie-title");
 const movieMetaEl = qs("#movie-meta");
 const movieOverviewEl = qs("#movie-overview");
+const controlsWrap = document.querySelector(".controls");
 
 let currentMovie = null;
-let currentSources = null; // { streamUrl, downloadUrl, posterUrl }
+let currentSources = [];   // Array of {quality, stream_url, download_url, size, format}
+let currentSubtitles = []; // Array of {lan, lanName, url, ...}
 
 function setModalVisible(visible) {
   modal.setAttribute("aria-hidden", visible ? "false" : "true");
@@ -134,6 +132,8 @@ function setModalVisible(visible) {
     streamPlayer.removeAttribute("src");
     trailerFrame.removeAttribute("src");
     trailerWrap.classList.add("hidden");
+    // Clear any <track> elements when closing
+    Array.from(streamPlayer.querySelectorAll("track")).forEach(t => t.remove());
   }
 }
 
@@ -149,19 +149,20 @@ async function openModal(movie, opts = {}) {
 
   status.textContent = "Loading sources…";
   try {
-    currentSources = await fetchGiftedSources(movie);
+    const payload = await fetchGiftedPayload(movie);
+    currentSources = payload.results || [];
+    currentSubtitles = payload.subtitles || [];
   } catch (e) {
     console.error(e);
-    currentSources = null;
+    currentSources = [];
+    currentSubtitles = [];
   }
 
-  // Configure buttons
-  playStreamBtn.disabled = !currentSources?.streamUrl;
-  downloadLink.style.display = currentSources?.downloadUrl ? "inline-flex" : "none";
-  if (currentSources?.downloadUrl) {
-    downloadLink.href = currentSources.downloadUrl;
-    downloadLink.setAttribute("download", sanitizeFileName(`${movie.title}-${year}`) + ".mp4");
-  }
+  // Build dynamic controls: quality buttons + download + trailer
+  buildControls(currentSources, year);
+
+  // Preload subtitles tracks (optional)
+  attachSubtitles(currentSubtitles);
 
   // Trailer
   if (opts.showTrailer) {
@@ -175,54 +176,83 @@ async function openModal(movie, opts = {}) {
   status.textContent = "";
 }
 
-function sanitizeFileName(name) {
-  return String(name).replace(/[^\w\-]+/g, "_");
+function buildControls(sources, year) {
+  controlsWrap.innerHTML = "";
+
+  if (!sources.length) {
+    const warn = createEl("button", "secondary");
+    warn.textContent = "No sources available";
+    warn.disabled = true;
+    controlsWrap.appendChild(warn);
+  }
+
+  // Create a play button for each quality
+  sources.forEach(src => {
+    const btn = createEl("button", "primary");
+    btn.textContent = `Play ${src.quality}`;
+    btn.addEventListener("click", () => {
+      // Set the stream URL and play
+      streamPlayer.src = src.stream_url;
+      streamPlayer.play().catch(() => {});
+      confettiBurst();
+      // Update download link
+      downloadLink.href = src.download_url;
+      downloadLink.setAttribute("download", sanitizeFileName(`${currentMovie.title}-${year}-${src.quality}`) + ".mp4");
+      downloadLink.style.display = "inline-flex";
+    });
+    controlsWrap.appendChild(btn);
+  });
+
+  // Trailer button
+  const trailerBtn = createEl("button", "ghost");
+  trailerBtn.textContent = "Watch trailer";
+  trailerBtn.addEventListener("click", async () => {
+    await loadTrailer(currentMovie);
+  });
+  controlsWrap.appendChild(trailerBtn);
+}
+
+function attachSubtitles(subtitles) {
+  // Remove any existing tracks first
+  Array.from(streamPlayer.querySelectorAll("track")).forEach(t => t.remove());
+  subtitles.forEach(sub => {
+    const track = document.createElement("track");
+    track.kind = "subtitles";
+    track.label = sub.lanName || sub.lan || "Subtitle";
+    track.srclang = (sub.lan || "en").slice(0, 2);
+    track.src = sub.url;
+    streamPlayer.appendChild(track);
+  });
 }
 
 /* =========================
-   GiftedTech sources
+   GiftedTech payload (sources + subtitles)
    ========================= */
 
 /**
- * Tries to fetch streaming and download URLs for the selected movie.
- * Adjust this function to match the exact response of your API.
- * Example assumption:
- * GET https://movieapi.giftedtech.co.ke/api/sources/{id}
- * -> { stream: "https://...", download: "https://...", poster: "https://..." }
+ * The endpoint returns:
+ * {
+ *   status: 200,
+ *   success: true,
+ *   creator: "GiftedTech",
+ *   results: [{ id, quality, download_url, stream_url, size, format }, ...],
+ *   subtitles: [{ id, lan, lanName, url, size, delay }, ...]
+ * }
  */
-async function fetchGiftedSources(movie) {
-  // Heuristic: use TMDB ID as the GiftedTech ID when available, else try title hash or ask user to click a "Try ID"
-  // If your API uses a different numeric/string ID, replace this with the correct mapping.
-  const giftedId = movie.id; // Adjust as needed.
-
+async function fetchGiftedPayload(movie) {
+  // Mapping note:
+  // If your GiftedTech IDs are NOT TMDB IDs, replace this with the correct mapping (e.g., another field you store).
+  const giftedId = movie.id; // adjust if needed
   const url = `${GIFTED_BASE}${giftedId}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("GiftedTech sources fetch failed");
   const data = await res.json();
-
-  // Normalize keys
-  const streamUrl = data.stream || data.streaming_url || data.hls || data.m3u8 || data.url || null;
-  const downloadUrl = data.download || data.download_url || data.file || data.mp4 || null;
-  const posterUrl = data.poster || data.thumbnail || null;
-
-  return { streamUrl, downloadUrl, posterUrl };
+  return data;
 }
 
 /* =========================
-   Stream controls
+   Trailer
    ========================= */
-
-playStreamBtn.addEventListener("click", () => {
-  if (!currentSources?.streamUrl) return;
-  streamPlayer.src = currentSources.streamUrl;
-  streamPlayer.play().catch(() => {/* autoplay may be blocked */});
-  confettiBurst();
-});
-
-showTrailerBtn.addEventListener("click", async () => {
-  if (!currentMovie) return;
-  await loadTrailer(currentMovie);
-});
 
 async function loadTrailer(movie) {
   try {
@@ -260,7 +290,7 @@ form.addEventListener("submit", (e) => {
   searchMovies(q);
 });
 
-// Initial popular fallback for delight
+// Initial popular fallback
 (async function loadPopular() {
   status.textContent = "Loading popular…";
   try {
@@ -274,3 +304,11 @@ form.addEventListener("submit", (e) => {
     status.textContent = "Unable to load popular movies.";
   }
 })();
+
+/* =========================
+   Utilities
+   ========================= */
+
+function sanitizeFileName(name) {
+  return String(name).replace(/[^\w\-]+/g, "_");
+}
