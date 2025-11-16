@@ -1,73 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Hub</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app" id="app">
-    <header class="topbar">
-      <div class="brand">
-        <h1>🎬 <span>Movie Hub</span></h1>
-        <div class="controls">
-          <label class="small">Theme
-            <select id="themeSelect" title="Choose color theme">
-              <option value="vibrant">Vibrant</option>
-              <option value="sunset">Sunset</option>
-              <option value="ocean">Ocean</option>
-              <option value="neon">Neon</option>
-            </select>
-          </label>
 
-          <button id="modeToggle" aria-pressed="false" title="Toggle Light/Dark">🌙</button>
-        </div>
-      </div>
+<header>
+  <h1>🎬 Movie Hub</h1>
 
-      <form id="searchForm" class="search" autocomplete="off">
-        <input id="searchInput" type="search" placeholder="Search movies..." />
-        <button type="submit">Search</button>
-        <ul id="suggestions" class="suggestions" hidden></ul>
-      </form>
+  <div class="top-controls">
+      <input id="searchInput" type="text" placeholder="Search movies...">
+      <button id="themeToggle">🌙</button>
 
-      <nav class="sections" id="sections">
-        <button data-section="popular" class="active">Popular</button>
-        <button data-section="trending">Trending</button>
-        <button data-section="now_playing">Now Playing</button>
-        <button data-section="top_rated">Top Rated</button>
-      </nav>
-    </header>
+      <select id="colorTheme">
+        <option value="">Theme Color</option>
+        <option value="sunset">Sunset</option>
+        <option value="ocean">Ocean</option>
+        <option value="neo">Neo</option>
+      </select>
+  </div>
 
-    <main>
-      <div id="loading" class="loading" hidden>
-        <div class="spinner"></div>
-      </div>
+  <div id="suggestions" class="suggestions hidden"></div>
 
-      <section class="content">
-        <div class="grid" id="moviesGrid" aria-live="polite"></div>
+  <nav class="sections">
+    <button class="sec-btn active" data-sec="popular">Popular</button>
+    <button class="sec-btn" data-sec="top_rated">Top Rated</button>
+    <button class="sec-btn" data-sec="now_playing">Now Playing</button>
+    <button class="sec-btn" data-sec="trending">Trending</button>
+  </nav>
+</header>
 
-        <div class="pagination" id="pagination">
-          <button id="prevBtn" disabled>← Prev</button>
-          <span id="pageInfo">Page 1 / 1</span>
-          <button id="nextBtn" disabled>Next →</button>
-        </div>
-      </section>
-    </main>
+<div id="loader" class="loader hidden"></div>
 
-    <!-- Movie Details Modal -->
-    <div id="modal" class="modal" aria-hidden="true">
-      <div class="modal-dialog" role="dialog" aria-modal="true">
-        <button class="modal-close" id="modalClose" title="Close">✕</button>
-        <div class="modal-body" id="modalBody"></div>
+<div id="moviesGrid" class="grid"></div>
+
+<div class="pagination">
+  <button id="prevPage">Prev</button>
+  <span id="pageInfo">Page 1 of 1</span>
+  <button id="nextPage">Next</button>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <span id="modalClose" class="modal-close">&times;</span>
+
+    <div class="modal-header">
+      <img id="modalPoster" class="modal-poster">
+      <div>
+        <h2 id="modalTitle"></h2>
+        <p id="modalSub" class="muted"></p>
       </div>
     </div>
 
-    <footer class="footer">
-      <small>Made with ❤️ — Movie Hub</small>
-    </footer>
-  </div>
+    <p id="modalOverview"></p>
 
-  <script src="app.js" defer></script>
+    <h3>Cast</h3>
+    <div id="modalCast" class="cast-grid"></div>
+
+    <h3>Trailers</h3>
+    <div id="modalVideos" class="video-grid"></div>
+
+    <h3>Download Links</h3>
+    <div id="modalDownload"></div>
+
+  </div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
