@@ -2,104 +2,64 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MovieHub — Ultimate</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gifted Movies</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-  <header class="hero">
-    <div class="hero-inner container">
-      <div class="brand-row">
-        <h1 class="brand">🎬 MovieHub</h1>
-
-        <div class="controls">
-          <input id="searchInput" placeholder="Search movies, shows, anime..." />
-          <select id="themeSelect" title="Choose theme">
-            <option value="">Default</option>
-            <option value="netflix">Netflix</option>
-            <option value="disney">Disney</option>
-            <option value="anime">Anime</option>
-            <option value="imdb">IMDB</option>
-            <option value="glass">Glass</option>
-          </select>
-          <button id="watchlistBtn" title="Watchlist">⭐ Watchlist</button>
-        </div>
-      </div>
-
-      <nav class="nav-sections">
-        <button class="sec-btn active" data-sec="popular">Popular</button>
-        <button class="sec-btn" data-sec="trending">Trending</button>
-        <button class="sec-btn" data-sec="now_playing">Now Playing</button>
-        <button class="sec-btn" data-sec="top_rated">Top Rated</button>
-        <button class="sec-btn" data-sec="tv">TV Shows</button>
-        <button class="sec-btn" data-sec="anime">Anime</button>
-      </nav>
-    </div>
+  <header class="header">
+    <h1>🎬 Gifted Movies</h1>
+    <form id="search-form" aria-label="Search movies">
+      <input
+        id="search-input"
+        type="search"
+        placeholder="Search movies (title)"
+        autocomplete="off"
+        aria-label="Search movies by title"
+      />
+      <button type="submit">Search</button>
+    </form>
   </header>
 
-  <main class="container">
-    <div id="loader" class="loader hidden" aria-hidden="true"></div>
-
-    <section id="moviesGrid" class="grid" aria-live="polite"></section>
-
-    <div class="pagination">
-      <button id="prevPage">← Prev</button>
-      <span id="pageInfo">Page 1</span>
-      <button id="nextPage">Next →</button>
-    </div>
+  <main>
+    <section id="results" class="grid" aria-live="polite"></section>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
   </main>
 
-  <!-- WATCHLIST PANEL -->
-  <aside id="watchlistPanel" class="watchlist hidden" aria-hidden="true">
-    <div class="watchlist-head">
-      <h3>Watchlist</h3>
-      <div>
-        <button id="clearWatchlist" class="btn outline">Clear</button>
-        <button id="closeWatchlist" class="btn">Close</button>
-      </div>
-    </div>
-    <div id="watchlistItems" class="watchlist-items"></div>
-  </aside>
-
-  <!-- MOVIE MODAL -->
-  <div id="modal" class="modal hidden" aria-hidden="true" role="dialog">
-    <div class="modal-dialog">
-      <button id="modalClose" class="modal-close" aria-label="Close">✕</button>
-      <div class="modal-body">
+  <!-- Modal -->
+  <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button id="modal-close" class="close" aria-label="Close">✕</button>
+      <div id="modal-body">
         <div class="modal-left">
-          <img id="modalPoster" class="modal-poster" alt="poster">
-          <div id="modalDownload" class="download-links"></div>
-        </div>
-
-        <div class="modal-right">
-          <h2 id="modalTitle"></h2>
-          <p id="modalSub" class="muted"></p>
-          <p id="modalOverview"></p>
-
-          <div class="modal-actions">
-            <button id="favBtn" class="btn">☆ Add to Watchlist</button>
-            <a id="openTmdb" class="btn outline" target="_blank" rel="noopener">Open on TMDb</a>
+          <div class="video-wrapper">
+            <video id="stream-player" controls playsinline preload="metadata" poster="" aria-label="Stream player"></video>
           </div>
-
-          <h3>Trailers</h3>
-          <div id="modalVideos" class="video-grid"></div>
-
-          <h3>Cast</h3>
-          <div id="modalCast" class="cast-grid"></div>
+          <div class="controls">
+            <button id="play-stream" class="primary">Play stream</button>
+            <a id="download-link" class="secondary" href="#" download>Download</a>
+            <button id="show-trailer" class="ghost">Watch trailer</button>
+          </div>
+        </div>
+        <div class="modal-right">
+          <h2 id="movie-title"></h2>
+          <p id="movie-meta"></p>
+          <p id="movie-overview"></p>
+          <div id="trailer" class="trailer hidden" aria-label="Trailer video">
+            <iframe id="trailer-frame" title="Trailer" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- PLAYER MODAL -->
-  <div id="playerModal" class="modal hidden" aria-hidden="true">
-    <div class="modal-dialog small">
-      <button class="modal-close player-close" aria-label="Close">✕</button>
-      <div id="playerContainer" class="player-container"></div>
-    </div>
-  </div>
+  <!-- Celebration canvas -->
+  <canvas id="confetti-canvas" class="confetti"></canvas>
 
-<script src="app.js" defer></script>
+  <footer class="footer">
+    <small>Built for streaming, downloading, and trailers • Accessible • Fast</small>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
