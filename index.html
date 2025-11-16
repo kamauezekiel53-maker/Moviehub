@@ -1,87 +1,73 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PublicMovieHub — Play Public Domain Movies</title>
-  <link rel="stylesheet" href="style.css">
-  <meta name="theme-color" content="#071420">
+  <title>Movie Hub</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">🍿 <strong>PublicMovieHub</strong></div>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>🎬 <span>Movie Hub</span></h1>
+        <div class="controls">
+          <label class="small">Theme
+            <select id="themeSelect" title="Choose color theme">
+              <option value="vibrant">Vibrant</option>
+              <option value="sunset">Sunset</option>
+              <option value="ocean">Ocean</option>
+              <option value="neon">Neon</option>
+            </select>
+          </label>
 
-    <nav class="nav">
-      <input id="search" class="search" placeholder="Search movies, genres, descriptions..." />
-      <button id="signinBtn" class="btn small">Sign In</button>
-      <div id="userChip" class="userchip hidden"></div>
-    </nav>
-  </header>
-
-  <main class="app">
-    <section class="hero">
-      <div class="hero-left">
-        <h1 id="heroTitle">Watch public-domain & openly licensed films</h1>
-        <p id="heroText">Static accounts (local-only), watchlist, offline caching, and playable demos — no backend required.</p>
-        <div class="cta-row">
-          <button id="browseAll" class="btn large">Browse All</button>
-          <button id="openMockup" class="btn ghost large">Open Mockup</button>
+          <button id="modeToggle" aria-pressed="false" title="Toggle Light/Dark">🌙</button>
         </div>
       </div>
-      <div class="hero-right">
-        <div class="hero-poster">🎬</div>
+
+      <form id="searchForm" class="search" autocomplete="off">
+        <input id="searchInput" type="search" placeholder="Search movies..." />
+        <button type="submit">Search</button>
+        <ul id="suggestions" class="suggestions" hidden></ul>
+      </form>
+
+      <nav class="sections" id="sections">
+        <button data-section="popular" class="active">Popular</button>
+        <button data-section="trending">Trending</button>
+        <button data-section="now_playing">Now Playing</button>
+        <button data-section="top_rated">Top Rated</button>
+      </nav>
+    </header>
+
+    <main>
+      <div id="loading" class="loading" hidden>
+        <div class="spinner"></div>
       </div>
-    </section>
 
-    <section class="rows" id="rowsContainer">
-      <!-- Rows (carousels) injected by JS -->
-    </section>
+      <section class="content">
+        <div class="grid" id="moviesGrid" aria-live="polite"></div>
 
-    <div id="empty" class="empty">No movies found — try searching or browse all.</div>
-  </main>
-
-  <footer class="footer">
-    Built with public-domain demos • Local accounts only • Replace demo sources with real MP4/HLS links.
-  </footer>
-
-  <!-- Play modal -->
-  <div id="playerModal" class="modal" aria-hidden="true">
-    <div class="playerCard">
-      <video id="videoPlayer" controls crossorigin playsinline></video>
-      <div class="playerMeta">
-        <h3 id="videoTitle"></h3>
-        <p id="videoDesc"></p>
-        <div class="playerActions">
-          <button id="addWatchlist" class="btn small">Add to Watchlist</button>
-          <button id="openSource" class="btn small ghost">Open Source</button>
-          <button id="closePlayer" class="btn small ghost">Close</button>
+        <div class="pagination" id="pagination">
+          <button id="prevBtn" disabled>← Prev</button>
+          <span id="pageInfo">Page 1 / 1</span>
+          <button id="nextBtn" disabled>Next →</button>
         </div>
+      </section>
+    </main>
+
+    <!-- Movie Details Modal -->
+    <div id="modal" class="modal" aria-hidden="true">
+      <div class="modal-dialog" role="dialog" aria-modal="true">
+        <button class="modal-close" id="modalClose" title="Close">✕</button>
+        <div class="modal-body" id="modalBody"></div>
       </div>
     </div>
+
+    <footer class="footer">
+      <small>Made with ❤️ — Movie Hub</small>
+    </footer>
   </div>
 
-  <!-- Sign-in modal -->
-  <div id="authModal" class="modal" aria-hidden="true">
-    <div class="authCard">
-      <h3 id="authTitle">Sign In / Sign Up</h3>
-      <input id="authUser" placeholder="username" />
-      <input id="authPass" placeholder="password" type="password" />
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
-        <button id="authSignIn" class="btn small">Sign In</button>
-        <button id="authSignUp" class="btn small ghost">Sign Up</button>
-        <button id="authClose" class="btn small ghost">Close</button>
-      </div>
-      <div id="authMsg" class="meta small" style="margin-top:8px;"></div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.5/dist/hls.min.js"></script>
-  <script src="app.js"></script>
-  <script>
-    // register service worker for offline caching
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('service-worker.js').catch(e=>console.warn('SW register failed',e));
-    }
-  </script>
+  <script src="app.js" defer></script>
 </body>
 </html>
