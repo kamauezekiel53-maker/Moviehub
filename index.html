@@ -1,75 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Movie Hub</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header>
-  <h1>🎬 Movie Hub</h1>
+  <!-- Background video header -->
+  <header class="hero">
+    <video class="hero-video" autoplay muted loop playsinline>
+      <!-- small, royalty-free sample; replace with your own mp4 if desired -->
+      <source src="https://cdn.coverr.co/videos/coverr-night-city-lights-1583?fm=mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
 
-  <div class="top-controls">
-      <input id="searchInput" type="text" placeholder="Search movies...">
-      <button id="themeToggle">🌙</button>
+    <div class="hero-inner">
+      <div class="brand-row">
+        <h1 class="brand">🎬 Movie Hub</h1>
 
-      <select id="colorTheme">
-        <option value="">Theme Color</option>
-        <option value="sunset">Sunset</option>
-        <option value="ocean">Ocean</option>
-        <option value="neo">Neo</option>
-      </select>
-  </div>
-
-  <div id="suggestions" class="suggestions hidden"></div>
-
-  <nav class="sections">
-    <button class="sec-btn active" data-sec="popular">Popular</button>
-    <button class="sec-btn" data-sec="top_rated">Top Rated</button>
-    <button class="sec-btn" data-sec="now_playing">Now Playing</button>
-    <button class="sec-btn" data-sec="trending">Trending</button>
-  </nav>
-</header>
-
-<div id="loader" class="loader hidden"></div>
-
-<div id="moviesGrid" class="grid"></div>
-
-<div class="pagination">
-  <button id="prevPage">Prev</button>
-  <span id="pageInfo">Page 1 of 1</span>
-  <button id="nextPage">Next</button>
-</div>
-
-<!-- Modal -->
-<div id="modal" class="modal hidden">
-  <div class="modal-content">
-    <span id="modalClose" class="modal-close">&times;</span>
-
-    <div class="modal-header">
-      <img id="modalPoster" class="modal-poster">
-      <div>
-        <h2 id="modalTitle"></h2>
-        <p id="modalSub" class="muted"></p>
+        <div class="controls">
+          <button id="themeToggle" title="Toggle light/dark">🌙</button>
+          <select id="colorTheme" title="Select color theme">
+            <option value="">Accent</option>
+            <option value="sunset">Sunset</option>
+            <option value="ocean">Ocean</option>
+            <option value="neo">Neo</option>
+            <option value="galaxy">Galaxy</option>
+            <option value="gold">Gold</option>
+            <option value="matrix">Matrix</option>
+          </select>
+          <button id="favoritesBtn" title="Open Watchlist">⭐ Watchlist</button>
+        </div>
       </div>
+
+      <div class="search-row">
+        <input id="searchInput" type="search" placeholder="Search movies or TV shows..." />
+        <button id="searchBtn">Search</button>
+      </div>
+
+      <div id="suggestions" class="suggestions hidden"></div>
+
+      <nav class="nav-sections">
+        <button class="sec-btn active" data-sec="popular">Popular</button>
+        <button class="sec-btn" data-sec="trending">Trending</button>
+        <button class="sec-btn" data-sec="now_playing">Now Playing</button>
+        <button class="sec-btn" data-sec="top_rated">Top Rated</button>
+        <button class="sec-btn" data-sec="tv_popular">TV Shows</button>
+        <button class="sec-btn" data-sec="anime">Anime</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CAROUSELS -->
+  <section id="carousels">
+    <div class="carousel-block">
+      <h2 class="carousel-title">🔥 Trending This Week</h2>
+      <button class="carousel-btn left" data-target="trendingRow">❮</button>
+      <div class="carousel-row" id="trendingRow"></div>
+      <button class="carousel-btn right" data-target="trendingRow">❯</button>
     </div>
 
-    <p id="modalOverview"></p>
+    <div class="carousel-block">
+      <h2 class="carousel-title">⭐ Top Rated</h2>
+      <button class="carousel-btn left" data-target="topRatedRow">❮</button>
+      <div class="carousel-row" id="topRatedRow"></div>
+      <button class="carousel-btn right" data-target="topRatedRow">❯</button>
+    </div>
 
-    <h3>Cast</h3>
-    <div id="modalCast" class="cast-grid"></div>
+    <div class="carousel-block">
+      <h2 class="carousel-title">🎬 Now Playing</h2>
+      <button class="carousel-btn left" data-target="nowPlayingRow">❮</button>
+      <div class="carousel-row" id="nowPlayingRow"></div>
+      <button class="carousel-btn right" data-target="nowPlayingRow">❯</button>
+    </div>
+  </section>
 
-    <h3>Trailers</h3>
-    <div id="modalVideos" class="video-grid"></div>
+  <!-- SKELETON / LOADER -->
+  <div id="loader" class="loader hidden" aria-hidden="true"></div>
 
-    <h3>Download Links</h3>
-    <div id="modalDownload"></div>
+  <!-- MAIN GRID -->
+  <main>
+    <section id="moviesGrid" class="grid"></section>
 
+    <div class="pagination">
+      <button id="prevPage">← Prev</button>
+      <span id="pageInfo">Page 1 of 1</span>
+      <button id="nextPage">Next →</button>
+    </div>
+  </main>
+
+  <!-- WATCHLIST SIDEPANEL -->
+  <aside id="watchlistPanel" class="watchlist hidden">
+    <div class="watchlist-head">
+      <h3>Watchlist</h3>
+      <button id="closeWatchlist">Close</button>
+    </div>
+    <div id="watchlistItems"></div>
+  </aside>
+
+  <!-- MOVIE MODAL -->
+  <div id="modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content">
+      <button id="modalClose" class="modal-close" title="Close">✕</button>
+      <div class="modal-grid">
+        <div class="modal-left">
+          <img id="modalPoster" class="modal-poster" alt="poster">
+          <div id="modalDownload" class="download-links"></div>
+        </div>
+        <div class="modal-right">
+          <h2 id="modalTitle"></h2>
+          <p id="modalSub" class="muted"></p>
+          <p id="modalOverview"></p>
+
+          <div class="modal-actions">
+            <button id="favBtn" class="btn">☆ Add to Watchlist</button>
+            <a id="moreLink" class="btn outline" target="_blank" rel="noopener">Open TMDb</a>
+          </div>
+
+          <h3>Trailers</h3>
+          <div id="modalVideos" class="video-grid"></div>
+
+          <h3>Cast</h3>
+          <div id="modalCast" class="cast-grid"></div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<script src="app.js"></script>
+  <!-- ACTOR MODAL -->
+  <div id="actorModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content">
+      <button class="modal-close actor-close" title="Close">✕</button>
+      <div id="actorBody"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <small>Made with ❤️ — Movie Hub</small>
+  </footer>
+
+  <script src="app.js" defer></script>
 </body>
 </html>
