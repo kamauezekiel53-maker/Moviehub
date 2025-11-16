@@ -3,19 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Movie Hub — Ultimate</title>
+  <title>Movie Hub</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- HERO / BACKGROUND VIDEO -->
+  <!-- HEADER / SEARCH -->
   <header class="hero">
-    <video class="hero-video" autoplay muted loop playsinline>
-      <source src="https://cdn.coverr.co/videos/coverr-night-city-lights-1583?fm=mp4" type="video/mp4">
-    </video>
-    <div class="hero-overlay"></div>
-
-    <div class="hero-inner">
+    <div class="hero-inner container">
       <div class="brand-row">
         <h1 class="brand">🎬 Movie Hub</h1>
         <div class="controls">
@@ -25,16 +20,12 @@
             <option value="sunset">Sunset</option>
             <option value="ocean">Ocean</option>
             <option value="neo">Neo</option>
-            <option value="galaxy">Galaxy</option>
-            <option value="gold">Gold</option>
-            <option value="matrix">Matrix</option>
           </select>
-          <button id="watchlistBtn" title="Open Watchlist">⭐ Watchlist</button>
         </div>
       </div>
 
       <div class="search-row">
-        <input id="searchInput" type="search" placeholder="Search movies, TV shows, actors..." />
+        <input id="searchInput" type="search" placeholder="Search movies..." />
         <button id="searchBtn">Search</button>
       </div>
 
@@ -51,7 +42,7 @@
     </div>
   </header>
 
-  <!-- CAROUSELS -->
+  <!-- OPTIONAL CAROUSELS (keeps UI lively) -->
   <section id="carousels" class="container">
     <div class="carousel-block">
       <h2 class="carousel-title">🔥 Trending This Week</h2>
@@ -75,9 +66,10 @@
     </div>
   </section>
 
-  <!-- LOADER / SKELETON / MAIN GRID -->
-  <div id="loader" class="loader hidden" aria-hidden="true"></div>
+  <!-- LOADER -->
+  <div id="loader" class="loader hidden" aria-hidden="true" title="loading"></div>
 
+  <!-- MAIN GRID -->
   <main class="container">
     <section id="moviesGrid" class="grid" aria-live="polite"></section>
 
@@ -88,27 +80,17 @@
     </div>
   </main>
 
-  <!-- WATCHLIST SIDE PANEL -->
-  <aside id="watchlistPanel" class="watchlist hidden" aria-hidden="true">
-    <div class="watchlist-head">
-      <h3>Watchlist</h3>
-      <div>
-        <button id="clearWatchlist" class="btn outline">Clear</button>
-        <button id="closeWatchlist" class="btn">Close</button>
-      </div>
-    </div>
-    <div id="watchlistItems" class="watchlist-items"></div>
-  </aside>
-
-  <!-- MOVIE DETAILS MODAL -->
-  <div id="modal" class="modal hidden" aria-hidden="true" role="dialog">
+  <!-- MOVIE MODAL -->
+  <div id="modal" class="modal hidden" aria-hidden="true">
     <div class="modal-dialog">
       <button id="modalClose" class="modal-close" aria-label="Close">✕</button>
+
       <div class="modal-body">
         <div class="modal-left">
           <img id="modalPoster" class="modal-poster" alt="poster">
           <div id="modalDownload" class="download-links"></div>
         </div>
+
         <div class="modal-right">
           <h2 id="modalTitle"></h2>
           <p id="modalSub" class="muted"></p>
@@ -130,23 +112,20 @@
   </div>
 
   <!-- ACTOR MODAL -->
-  <div id="actorModal" class="modal hidden" aria-hidden="true" role="dialog">
+  <div id="actorModal" class="modal hidden" aria-hidden="true">
     <div class="modal-dialog">
       <button class="modal-close actor-close" aria-label="Close">✕</button>
       <div id="actorBody" class="modal-body actor-body"></div>
     </div>
   </div>
 
-  <!-- SMALL VIDEO PLAYER (for trailers) -->
+  <!-- PLAYER MODAL (for trailers) -->
   <div id="playerModal" class="modal hidden" aria-hidden="true">
     <div class="modal-dialog small">
-      <button class="modal-close player-close" aria-label="Close">✕</button>
+      <button class="modal-close player-close">✕</button>
       <div id="playerContainer" class="player-container"></div>
     </div>
   </div>
-
-  <!-- TOASTS -->
-  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
   <footer class="footer container">
     <small>Made with ❤️ — Movie Hub</small>
