@@ -2,62 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gifted Movies</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Movie Hub</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="header">
-    <h1>🎬 Gifted Movies</h1>
-    <form id="search-form" aria-label="Search movies">
-      <input
-        id="search-input"
-        type="search"
-        placeholder="Search movies (title)"
-        autocomplete="off"
-        aria-label="Search movies by title"
-      />
-      <button type="submit">Search</button>
-    </form>
+  <header class="site-header">
+    <div class="brand">Movie Hub</div>
+    <div class="controls">
+      <input id="searchInput" placeholder="Search movies..." autocomplete="off" />
+      <select id="colorTheme">
+        <option value="">Default</option>
+        <option value="sunset">Sunset</option>
+        <option value="ocean">Ocean</option>
+        <option value="neo">Neo</option>
+      </select>
+      <button id="themeToggle" title="Toggle light/dark">🌓</button>
+    </div>
   </header>
 
-  <main>
-    <section id="results" class="grid" aria-live="polite"></section>
-    <div id="status" class="status" role="status" aria-live="polite"></div>
+  <main class="container">
+    <aside class="sidebar">
+      <button class="sec-btn active" data-sec="popular">Popular</button>
+      <button class="sec-btn" data-sec="trending">Trending</button>
+      <button class="sec-btn" data-sec="now_playing">Now Playing</button>
+      <button class="sec-btn" data-sec="top_rated">Top Rated</button>
+    </aside>
+
+    <section class="content">
+      <div id="loader" class="loader hidden">Loading…</div>
+
+      <div id="moviesGrid" class="grid"></div>
+
+      <div class="pager">
+        <button id="prevPage" class="btn">Prev</button>
+        <div id="pageInfo" class="page-info">Page 1</div>
+        <button id="nextPage" class="btn">Next</button>
+      </div>
+    </section>
   </main>
 
   <!-- Modal -->
-  <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <button id="modal-close" class="close" aria-label="Close">✕</button>
-      <div id="modal-body">
-        <div class="modal-left">
-          <div class="video-wrapper">
-            <video id="stream-player" controls playsinline preload="metadata" poster="" aria-label="Stream player"></video>
-          </div>
-          <div class="controls">
-            <button id="play-stream" class="primary">Play stream</button>
-            <a id="download-link" class="secondary" href="#" download>Download</a>
-            <button id="show-trailer" class="ghost">Watch trailer</button>
-          </div>
-        </div>
-        <div class="modal-right">
-          <h2 id="movie-title"></h2>
-          <p id="movie-meta"></p>
-          <p id="movie-overview"></p>
-          <div id="trailer" class="trailer hidden" aria-label="Trailer video">
-            <iframe id="trailer-frame" title="Trailer" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-          </div>
-        </div>
+  <div id="modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-inner">
+      <button id="modalClose" class="modal-close">✕</button>
+      <div class="modal-left">
+        <img id="modalPoster" alt="poster" />
+      </div>
+      <div class="modal-right">
+        <h2 id="modalTitle">Title</h2>
+        <div id="modalSub" class="muted"></div>
+        <p id="modalOverview"></p>
+
+        <h4>Cast</h4>
+        <div id="modalCast" class="cast-grid"></div>
+
+        <h4>Trailers</h4>
+        <div id="modalVideos" class="videos"></div>
+
+        <h4>Download / Streams</h4>
+        <div id="modalDownload" class="downloads"></div>
       </div>
     </div>
   </div>
 
-  <!-- Celebration canvas -->
-  <canvas id="confetti-canvas" class="confetti"></canvas>
-
-  <footer class="footer">
-    <small>Built for streaming, downloading, and trailers • Accessible • Fast</small>
+  <footer class="site-footer">
+    <small>Movie Hub • Demo</small>
   </footer>
 
   <script src="app.js"></script>
